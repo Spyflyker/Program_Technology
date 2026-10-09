@@ -1,57 +1,52 @@
 ﻿using System.Text;
 
-namespace Bank;
+namespace bank;
 
 internal class BankAccount
 {
-    static private int s_accountNuberSeed = 1000000000;
-    public string Number { get; }
+    private List<Transaction> _allTransactions = new List<Transaction>();
     public string Owner { get; private set; }
     public decimal Balance
     {
         get
         {
             decimal balance = 0;
-            foreach (var item in _allTransactions)
+            foreach (var transaction in _allTransactions)
             {
-                balance += item.Amount;
+                balance += transaction.Amount;
             }
-
             return balance;
         }
     }
-
-    private List<Transaction> _allTransactions = new List<Transaction>();
-
+    public string Number { get; }
+    private static int s_accountNumberSeed = 1000000000;
     public BankAccount(string name, decimal initialBalance)
     {
-
-        Owner = name; // this.Owner = name
-        MakeDeposit(initialBalance, DateTime.UtcNow, "Initial balance");
-        Number = s_accountNuberSeed.ToString();
-        s_accountNuberSeed++;
+        Owner = name;
+        MakeDeposite(initialBalance, DateTime.UtcNow, "initial balance");
+        Number = s_accountNumberSeed.ToString();
+        s_accountNumberSeed++;
     }
-    public void MakeDeposit(decimal amount, DateTime date, string note)
+    public void MakeDeposite(decimal amount, DateTime date, string note)
     {
-        if (amount <= 0)
+        if (amount < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(amount), "Amount of deposit must be positive");
+            throw new ArgumentOutOfRangeException(nameof(amount), "Amount off deposite must be positive");
         }
-
-        var deposit = new Transaction(amount, date, note);
-        _allTransactions.Add(deposit);
+        var deposite = new Transaction(amount, date, note);
+        _allTransactions.Add(deposite);
     }
 
     public void MakeWithdrawal(decimal amount, DateTime date, string note)
     {
-        if (amount <= 0)
+        if (amount < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(amount), "Amount of withdrawal must be positive");
+            throw new ArgumentOutOfRangeException(nameof(amount), "Amount off withdrawal must be positive");
         }
 
         if (Balance < amount)
         {
-            throw new InvalidOperationException("Not sufficient rubls for this withdawal");
+            throw new InvalidOperationException("Not sufficient rubls for this withdrawal");
         }
 
         var withdrawal = new Transaction(-amount, date, note);
@@ -63,12 +58,26 @@ internal class BankAccount
 
         decimal balance = 0;
         report.AppendLine("Data\t\tAmount\tBalance\tNote");
-        foreach
-             (var item in _allTransactions)
+        foreach (var item in _allTransactions)
         {
             balance += item.Amount;
-            report.AppendLine($"" + $"{item.Date.ToShortDateString()}\t" + $"{item.Amount}\t{balance}\t{item.Note}");
+            report.AppendLine($"" +
+                $"{item.Date.ToShortDateString()}\t" +
+                $"{item.Amount}\t{balance}\t{item.Note}");
         }
         return report.ToString();
     }
+
+    public virtual void PerformMonthAndTransaction()
+    {
+
+    }
+
+    // Переопределяем метод, который унаследовали от object
+    // этот метод должен возвращать строку с состоянием обьекта
+    public override string ToString()
+        => $"Type: {GetType().Name}\t" +
+        $"Owner: {Owner}\t" +
+        $"Number of account: {Number}\t" +
+        $"Balance: {Balance}";
 }
