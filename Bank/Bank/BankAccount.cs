@@ -53,7 +53,7 @@ public class BankAccount
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(amount);
 
         Transaction? overdraftTransaction
-            = CheckWithdrawalLimit(Balance - amount < _minimumBalance);
+            = CheckWithdrawalLimit(Balance - amount < _minimumBalance );
         Transaction? withdrawal = new(-amount, date, note);
 
         _allTransactions.Add(withdrawal);
